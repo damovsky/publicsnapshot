@@ -1,6 +1,6 @@
 {
   "name": "public_snapshots",
-  "version": "0.1.0",
+  "version": "0.1.1",
   "bin": {
     "public_snapshots": "bin/public_snapshots.js"
   },
@@ -12,16 +12,16 @@
   },
   "devDependencies": {
     "@types/jest": "^29.5.12",
-    "@types/node": "20.14.2",
+    "@types/node": "^20.14.2",
+    "aws-cdk": "2.146.0",
     "jest": "^29.7.0",
     "ts-jest": "^29.1.4",
-    "aws-cdk": "2.146.0",
     "ts-node": "^10.9.2",
     "typescript": "~5.4.5"
   },
   "dependencies": {
-    "aws-cdk-lib": "2.146.0",
-    "constructs": "^10.0.0",
+    "aws-cdk-lib": "^2.158.0",
+    "constructs": "^10.3.0",
     "source-map-support": "^0.5.21"
   }
 }

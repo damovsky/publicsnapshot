@@ -1,0 +1,92 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Public EC2 Snapshots Explorer</title>
+    <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
+    <style>
+        body { font-family: Arial, sans-serif; margin: 0; padding: 20px; }
+        h1 { color: #333; }
+        #results { margin-top: 20px; }
+        table { border-collapse: collapse; width: 100%; }
+        th, td { border: 1px solid #ddd; padding: 8px; text-align: left; }
+        th { background-color: #f2f2f2; }
+    </style>
+</head>
+<body>
+    <h1>Public EC2 Snapshots Explorer</h1>
+    <div>
+        <label for="snapshotType">Snapshot Type:</label>
+        <select id="snapshotType">
+            <option value="">All</option>
+            <option value="EC2">EC2</option>
+            <option value="RDS">RDS</option>
+            <option value="RDSCluster">RDS Cluster</option>
+        </select>
+        <button onclick="fetchSnapshots()">Fetch Snapshots</button>
+    </div>
+    <div id="results"></div>
+
+    <script>
+        const API_ENDPOINT = 'https://ao9pr5kv80.execute-api.eu-central-1.amazonaws.com/prod/';
+    
+        async function fetchSnapshots() {
+            const snapshotType = document.getElementById('snapshotType').value;
+            const resultsDiv = document.getElementById('results');
+            resultsDiv.innerHTML = 'Loading...';
+    
+            try {
+                console.log('Fetching from:', API_ENDPOINT);
+                const response = await axios.get(API_ENDPOINT, {
+                    params: snapshotType ? { snapshotType: snapshotType } : {},
+                    headers: {
+                        'Content-Type': 'application/json',
+                    }
+                });
+                console.log('Response:', response);
+                const snapshots = response.data;
+    
+                if (snapshots.length === 0) {
+                    resultsDiv.innerHTML = 'No snapshots found.';
+                    return;
+                }
+    
+                let tableHtml = '<table><tr><th>AWS Region</th><th>AWS Account ID</th><th>AWS Account Alias</th><th>ID</th><th>Type</th><th>Start Time</th><th>Size</th><th>Encrypted</th></tr>';
+                snapshots.forEach(snapshot => {
+                    tableHtml += `<tr>
+                        <td>${snapshot.awsRegion}</td>
+                        <td>${snapshot.ownerId}</td>
+                        <td>${snapshot.ownerAlias}</td>
+                        <td>${snapshot.snapshotId}</td>
+                        <td>${snapshot.snapshotType}</td>
+                        <td>${snapshot.startTime}</td>
+                        <td>${snapshot.volumeSize} GB</td>
+                        <td>${snapshot.encrypted ? 'Yes' : 'No'}</td>
+                    </tr>`;
+                });
+                tableHtml += '</table>';
+    
+                resultsDiv.innerHTML = tableHtml;
+            } catch (error) {
+                console.error('Error object:', error);
+                console.error('Error response:', error.response);
+                resultsDiv.innerHTML = `Error: ${error.message}`;
+                if (error.response) {
+                    console.error('Error data:', error.response.data);
+                    console.error('Error status:', error.response.status);
+                    console.error('Error headers:', error.response.headers);
+                }
+            }
+        }
+    </script>
+
+<iframe src="https://github.com/sponsors/damovsky/card" title="Sponsor damovsky" height="225" width="600" style="border: 0;"></iframe>
+
+
+    <!-- 100% privacy-first analytics -->
+<script async defer src="https://scripts.simpleanalyticscdn.com/latest.js"></script>
+<noscript><img src="https://queue.simpleanalyticscdn.com/noscript.gif" alt="" referrerpolicy="no-referrer-when-downgrade" /></noscript>
+
+</body>
+</html>
